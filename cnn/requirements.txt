@@ -1,0 +1,11 @@
+# Core Deep Learning Framework (includes CUDA/cuDNN for TF 2.10+)
+tensorflow[and-cuda]==2.10.0
+
+# Image Processing (Required for the Center-Crop logic)
+Pillow==9.4.0
+
+# Data Visualization and Plotting
+matplotlib==3.7.1
+
+# Numerical Computing
+numpy==1.23.5

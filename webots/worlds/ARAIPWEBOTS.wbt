@@ -1,0 +1,78 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/solids/protos/SolidBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/gctronic/e-puck/protos/E-puck.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/animals/protos/Cat.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.009943913854336548 -0.9998215203630281 0.016063810140208516 5.174726431495356
+  position -0.9274190085087427 0.1187303602922928 2.113609281051162
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+}
+Cat {
+  translation 0.0375319 0.337924 0
+  rotation 0 0 1 -2.487095001079161
+  scale 0.3
+}
+SolidBox {
+  translation -0.21 -0.22 0.05
+  name "box(3)"
+  size 0.3 0.3 0.1
+  appearance PBRAppearance {
+    baseColor 0 0 1
+    baseColorMap ImageTexture {
+      url [
+        "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/default/worlds/textures/tagged_wall.jpg"
+      ]
+    }
+    roughness 0.5
+    metalness 0
+    emissiveColor 0 0 1
+  }
+}
+SolidBox {
+  translation -0.22 0.34 0.05
+  name "box(2)"
+  size 0.3 0.3 0.1
+  appearance PBRAppearance {
+    baseColor 0 1 0
+    baseColorMap ImageTexture {
+      url [
+        "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/default/worlds/textures/tagged_wall.jpg"
+      ]
+    }
+    roughness 0.5
+    metalness 0
+    emissiveColor 0 1 0
+  }
+}
+SolidBox {
+  translation 0.29 -0.01 0.05
+  size 0.3 0.3 0.1
+  appearance PBRAppearance {
+    baseColor 1 0 0
+    baseColorMap ImageTexture {
+      url [
+        "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/default/worlds/textures/tagged_wall.jpg"
+      ]
+    }
+    roughness 0.5
+    metalness 0
+    emissiveColor 1 0 0
+  }
+}
+E-puck {
+  translation 0.0359124 -0.00698102 -0.00019006
+  rotation -0.00016151441773057867 -0.06499795163600854 -0.9978853842983252 0.004974526454217198
+  controller "cw3code"
+}
