@@ -4,7 +4,7 @@ An **e-puck** robot in **Webots** explores an arena, avoids obstacles, and watch
 
 <p align="center"><img src="media/predictions.png" alt="CNN predictions: cat 79.6%, airplane 99.7%, truck 91.0%, bird 100%" width="720"></p>
 
-The image on the left is the robot's own capture from Webots. The other three are real-world test photos.
+These results come from the notebook's training run. The image on the left is the robot's own capture from Webots, and the other three are real-world test photos.
 
 ## Pipeline
 
@@ -23,7 +23,7 @@ The image on the left is the robot's own capture from Webots. The other three ar
 | Controller | What it does |
 |---|---|
 | [`cw2controller`](webots/controllers/cw2controller/cw2controller.py) | Drives forward and, when the front sensors `ps0`/`ps7` detect something, backs up and turns left. Every 5 steps it averages the camera's RGB. A **red, green or blue** box is reported the first time it's seen (the channel must be ≥ 120 and beat the other two by 60). The robot keeps a list of the colours it has seen so far. |
-| [`cw3code`](webots/controllers/cw3code/cw3code.py) | Everything above, plus **cat detection**: if the average RGB is within ±50 of the cat's colour profile, the robot stops and saves `cat_capture_N.png`. This is the controller the world file uses. |
+| [`cw3code`](webots/controllers/cw3code/cw3code.py) | Everything above, plus **cat detection**: if the average RGB is within ±50 of the cat's colour profile, the robot saves `cat_capture_N.png`. It saves one photo per run. This is the controller the world file uses. |
 
 The world [`ARAIPWEBOTS.wbt`](webots/worlds/ARAIPWEBOTS.wbt) is a rectangular arena with an e-puck, a scaled-down Cat model, and red, green and blue boxes. It needs **Webots R2023b**.
 
@@ -44,7 +44,7 @@ There are **~1.22 M parameters**. Training used Adam, sparse categorical cross-e
 
 Augmentation and global average pooling were added to fix an earlier version that called the robot's cat capture an *airplane*. That version had learned to rely on blue-sky colour instead of shape.
 
-### Results
+### Results (from the training notebook)
 - **Training accuracy ≈ 90.7 %, validation accuracy ≈ 87–88 %** on the CIFAR-10 test set
 
 <p align="center"><img src="media/training_curve.png" alt="Training and validation accuracy" width="560"></p>
@@ -55,6 +55,8 @@ Augmentation and global average pooling were added to fix an earlier version tha
 | airplane photo | AIRPLANE | 99.7 % |
 | truck photo | TRUCK | 91.0 % |
 | bird photo | BIRD | 100 % |
+
+> **Note:** `final_model_v3.keras` in this repo comes from a separate training run. With TensorFlow 2.10, it still classifies the airplane (99 %) and bird (100 %) photos correctly, but it labels `cat_capture_0.png` as *airplane* (33 %). Re-running the notebook produces a fresh model.
 
 ### Inference
 [`classify_capture.py`](cnn/classify_capture.py) loads `final_model_v3.keras`, then prepares each image the same way as the training data:
@@ -69,7 +71,7 @@ Augmentation and global average pooling were added to fix an earlier version tha
 1. Open `webots/worlds/ARAIPWEBOTS.wbt` in Webots R2023b and run the simulation.
 2. The e-puck explores the arena and prints colours as it sees them. When it reaches the cat, it saves `cat_capture_0.png` into its controller folder.
 
-**Classifier part**
+**Classifier part** (needs **Python 3.10** or older, because TensorFlow 2.10 doesn't support newer Python)
 ```bash
 cd cnn
 pip install -r requirements.txt      # TensorFlow 2.10, Pillow, NumPy, Matplotlib
@@ -98,7 +100,8 @@ To retrain the model, open `train_cnn_cifar10.ipynb` in Jupyter or Google Colab.
 ## Limitations
 - The robot detects the cat by comparing its **average camera colour** to a fixed RGB profile. That's simple and fast, but other objects with similar colours could trigger it, and a lighting change could make it miss.
 - CIFAR-10 images are only 32×32 pixels, so the 79.6 % confidence on the cat reflects how hard it is to recognise an animal at that resolution, especially a rendered one.
-- `final_model_v3.keras` was saved by TensorFlow 2.10 in HDF5 format. On newer Keras versions, `classify_capture.py` falls back to loading it through `h5py`.
+- `final_model_v3.keras` was saved by TensorFlow 2.10 in HDF5 format, even though its name ends in `.keras`. It loads fine with the pinned TensorFlow 2.10. Keras 3 (TensorFlow 2.16+) can only load it if the file is renamed to `.h5`.
+- In `cw3code`, the stop command at the cat is overridden later in the same control step, so the robot photographs the cat without actually stopping.
 
 ## Context
 
