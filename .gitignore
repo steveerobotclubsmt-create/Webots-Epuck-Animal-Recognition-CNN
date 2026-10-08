@@ -12,3 +12,6 @@ snapshot*.png
 # OS
 .DS_Store
 Thumbs.db
+
+# Trained models (train with the notebook; too large / reproducible)
+*.keras

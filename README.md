@@ -56,10 +56,10 @@ Augmentation and global average pooling were added to fix an earlier version tha
 | truck photo | TRUCK | 91.0 % |
 | bird photo | BIRD | 100 % |
 
-> **Note:** `final_model_v3.keras` in this repo comes from a separate training run. With TensorFlow 2.10, it still classifies the airplane (99 %) and bird (100 %) photos correctly, but it labels `cat_capture_0.png` as *airplane* (33 %). Re-running the notebook produces a fresh model.
+The trained model isn't included in this repo, so re-run the notebook to reproduce it (see below). Training is random, so a new run's numbers will differ slightly.
 
 ### Inference
-[`classify_capture.py`](cnn/classify_capture.py) loads `final_model_v3.keras`, then prepares each image the same way as the training data:
+[`classify_capture.py`](cnn/classify_capture.py) loads the trained `final_model_v3.keras`, then prepares each image the same way as the training data:
 1. Convert to **RGB**, which drops the alpha channel from Webots PNGs
 2. **Center-crop** to a square, so the cat isn't stretched out of shape
 3. Resize to **32×32** with Lanczos filtering
@@ -71,15 +71,18 @@ Augmentation and global average pooling were added to fix an earlier version tha
 1. Open `webots/worlds/ARAIPWEBOTS.wbt` in Webots R2023b and run the simulation.
 2. The e-puck explores the arena and prints colours as it sees them. When it reaches the cat, it saves `cat_capture_0.png` into its controller folder.
 
-**Classifier part** (needs **Python 3.10** or older, because TensorFlow 2.10 doesn't support newer Python)
-```bash
-cd cnn
-pip install -r requirements.txt      # TensorFlow 2.10, Pillow, NumPy, Matplotlib
-python classify_capture.py
-```
-The script looks in the current folder for `cat_capture_0.png`, `airplane.png`, `truck.png` and `bird.png`, and skips any that are missing. A sample capture is included. Add your own photos with those names to try the other classes.
+**Classifier part**
 
-To retrain the model, open `train_cnn_cifar10.ipynb` in Jupyter or Google Colab. A GPU is recommended. Training downloads CIFAR-10 automatically and saves `final_model_v3.keras`.
+1. **Train the model.** Open [`cnn/train_cnn_cifar10.ipynb`](cnn/train_cnn_cifar10.ipynb) in Google Colab and choose a GPU runtime. Then run the first cell: it downloads CIFAR-10, trains, and saves `final_model_v3.keras`. The second cell classifies whatever test images you upload into the Colab session.
+2. **To classify on your own PC instead**, download `final_model_v3.keras` from Colab, put it in `cnn/` next to `cat_capture_0.png`, and run:
+   ```bash
+   cd cnn
+   pip install tensorflow pillow numpy matplotlib   # same TensorFlow generation as Colab (2.16+)
+   python classify_capture.py
+   ```
+   Use the same TensorFlow version to classify as you used to train. A model trained in Colab needs a recent TensorFlow. [`requirements.txt`](cnn/requirements.txt) pins TensorFlow 2.10 (Python 3.10 or older), which is for training and classifying locally.
+
+The script looks in the current folder for `cat_capture_0.png`, `airplane.png`, `truck.png` and `bird.png`, and skips any that are missing. A sample capture is included. Add your own photos with those names to try the other classes.
 
 ## Repository layout
 ```
@@ -91,7 +94,6 @@ To retrain the model, open `train_cnn_cifar10.ipynb` in Jupyter or Google Colab.
 ├── cnn/
 │   ├── train_cnn_cifar10.ipynb              # model definition, training, evaluation
 │   ├── classify_capture.py                  # inference on captured images
-│   ├── final_model_v3.keras                 # trained model (HDF5, Keras 2.10)
 │   ├── cat_capture_0.png                    # sample capture from the robot
 │   └── requirements.txt
 └── media/
@@ -100,7 +102,6 @@ To retrain the model, open `train_cnn_cifar10.ipynb` in Jupyter or Google Colab.
 ## Limitations
 - The robot detects the cat by comparing its **average camera colour** to a fixed RGB profile. That's simple and fast, but other objects with similar colours could trigger it, and a lighting change could make it miss.
 - CIFAR-10 images are only 32×32 pixels, so the 79.6 % confidence on the cat reflects how hard it is to recognise an animal at that resolution, especially a rendered one.
-- `final_model_v3.keras` was saved by TensorFlow 2.10 in HDF5 format, even though its name ends in `.keras`. It loads fine with the pinned TensorFlow 2.10. Keras 3 (TensorFlow 2.16+) can only load it if the file is renamed to `.h5`.
 - In `cw3code`, the stop command at the cat is overridden later in the same control step, so the robot photographs the cat without actually stopping.
 
 ## Context
